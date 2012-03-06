@@ -22,6 +22,11 @@ std::vector<UsbAccessory> 	UsbManager::getAccessoryList() {
 	struct usb_device *dev;
 	usb_find_busses();
 	usb_find_devices();
+//    if (usb_find_busses() < 0)
+//        printf("usb_find_busses() failed\n");
+//    if (usb_find_devices() < 0)
+//        printf("usb_find_devices() failed\n");
+
 	std::vector<UsbAccessory> result;
 	for (bus = usb_busses; bus; bus = bus->next) {
 		for (dev = bus->devices; dev; dev = dev->next) {
