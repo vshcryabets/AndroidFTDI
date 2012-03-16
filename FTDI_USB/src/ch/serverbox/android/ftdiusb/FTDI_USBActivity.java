@@ -26,6 +26,9 @@ package ch.serverbox.android.ftdiusb;
 
 import java.util.HashMap;
 import java.util.Iterator;
+
+import com.v2soft.androidftdi.FTDIDevice;
+
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -102,7 +105,8 @@ public class FTDI_USBActivity extends Activity {
 					if (dev != null) {
 						if (String.format("%04X:%04X", dev.getVendorId(),
 								dev.getProductId()).equals(VID_PID)) {
-							mainloop(dev);//has new thread
+//							mainloop(dev);//has new thread
+							new FTDIDevice((UsbManager) getSystemService(Context.USB_SERVICE), dev, 0);
 						}
 					} else {
 						e("device not present!");
