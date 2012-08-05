@@ -142,6 +142,7 @@ int main(void)
 		printf("Model: %s\n", (*i).getModel().c_str());
 		printf("Serial: %s\n", (*i).getSerial().c_str());
 		printf("Version: %s\n", (*i).getVersion().c_str());
+
 	}
 
 	struct usb_device *dev = findFTDevice();

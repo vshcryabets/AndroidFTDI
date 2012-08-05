@@ -6,6 +6,7 @@
  */
  
  byte data;
+byte counter = 0;
 
 void setup() {  
   // start serial port at 9600 bps:
@@ -17,12 +18,14 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(13, HIGH);   // set the LED on
-  delay(data+30);              // wait for a second
-  digitalWrite(13, LOW);    // set the LED off
+  digitalWrite(13, LOW);   // set the LED on
+  delay(data*10+30);              // wait for a second
+  digitalWrite(13, HIGH);    // set the LED off
   delay(80);              // wait for a second
     if (Serial.available() > 0) {
     // get incoming byte:
     data = Serial.read();
   }
+  Serial.print("Value=");
+  Serial.println(counter++);
 }

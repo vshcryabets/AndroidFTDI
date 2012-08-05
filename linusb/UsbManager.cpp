@@ -8,6 +8,7 @@
 #include "UsbManager.h"
 #include <usb.h>
 #include <vector>
+#include <stdio.h>
 
 UsbManager::UsbManager() {
 	usb_init();
@@ -40,6 +41,7 @@ std::vector<UsbAccessory> 	UsbManager::getAccessoryList() {
 
 			udev = usb_open(dev);
 			if (udev) {
+				printf("Desciptor=%p", dev->descriptor.bcdDevice);
 				if (dev->descriptor.iManufacturer) {
 					ret = usb_get_string_simple(udev, dev->descriptor.iManufacturer, string, sizeof(string));
 					if (ret > 0)
