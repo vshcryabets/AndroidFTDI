@@ -1,5 +1,7 @@
 package com.v2soft.androidftdi;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -13,28 +15,37 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 import com.v2soft.androidftdi.FTDIDevice.FtdiChipType;
 import com.v2soft.ftdi.R;
 
 /**
- * 
+ * Digital voltmeter activity
  * @author V.Shcryabets<vshcryabets@gmail.com>
  *
  */
-public class FTDI_USBActivity extends Activity {
+public class DigitalVoltmeter extends Activity implements OnClickListener {
 	protected static final String ACTION_USB_PERMISSION = "com.v2soft.android.USB";
 	private static final String VID_PID = "0403:6001";
-	protected static final String LOG_TAG = FTDI_USBActivity.class.getSimpleName();
+	protected static final String LOG_TAG = DigitalVoltmeter.class.getSimpleName();
 	public static UsbDevice sDevice = null;
 	private boolean mStop = false;
 	private boolean mStopped = true;
+	private FTDIDevice mDevice;
+	private TextView mTxtVolts;
+	private NumberFormat sFortmatter = new DecimalFormat("##0.0 V");
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.activity_voltmeter);
+		findViewById(R.id.btnStart).setOnClickListener(this);
+		findViewById(R.id.btnStop).setOnClickListener(this);
+		mTxtVolts = (TextView) findViewById(R.id.txtVolts);
 	}
 
 	@Override
@@ -109,42 +120,40 @@ public class FTDI_USBActivity extends Activity {
 	}
 
 	private void mainloop(UsbDevice d) {
-		sDevice = d;// not really nice...
+		final UsbManager usbm = (UsbManager) getSystemService(USB_SERVICE);
+		if (d == null)
+			return; 
+		mDevice = new FTDIDevice(usbm, d, 0, FtdiChipType.TypeR);
 		new Thread(mLoop).start();
 	}
 
 	private Runnable mLoop = new Runnable() {
 		@Override
 		public void run() {
-			final UsbManager usbm = (UsbManager) getSystemService(USB_SERVICE);
-			if (sDevice == null)
-				return; 
-			FTDIDevice device = new FTDIDevice(usbm, sDevice, 0, FtdiChipType.TypeR);
-			short counter = 0;
-			byte[] buffer = new byte[32];
+			byte[] buffer = new byte[16];
 			for(;;){//this is the main loop for transferring
-				buffer[0] = (byte) (counter&0xFF);
-				device.write(buffer, 0, 1);
-				try {
-					Thread.sleep(300);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-
 				if(mStop){
 					mStopped = true;
 					break;
 				}
-				counter++;
-				if ( counter > 255 ) {
-					counter = 0;
-				}
-				int read = device.read(buffer);
-				if ( read > 0 ) {
-					Log.d(LOG_TAG, "R="+read+" "+getHEX(buffer, 0, read));
+				int read = mDevice.read(buffer);
+				if ( read == 5 ) {
+					//Log.d(LOG_TAG, "R="+read+" "+getHEX(buffer, 0, read));
+					if ( (buffer[2] & 0xFF) == 0xAB ) {
+						final int value = ((buffer[3] << 8) & 0xFF00) | (buffer[4] & 0xFF );
+						float r1 = 4700; // 4k7
+						float r2 = 154000; //154k
+						final double volt = ((double)value*5.0/1023.0)*r2/r1; 
+						mTxtVolts.post(new Runnable() {
+							@Override
+							public void run() {
+								mTxtVolts.setText(sFortmatter.format(volt));
+							}
+						});
+					}
 				}
 			}
-			device.close();
+			mDevice.close();
 		}
 	};
 	
@@ -171,5 +180,23 @@ public class FTDI_USBActivity extends Activity {
 
 	private static void e(Object s) {
 		Log.e(LOG_TAG, ">==< " + s.toString() + " >==<");
+	}
+
+	// =======================================================
+	// OnCLick listener
+	// =======================================================
+	@Override
+	public void onClick(View v) {
+		int id = v.getId();
+		switch (id) {
+		case R.id.btnStart:
+			mDevice.write(new byte[]{'a','a'});
+			break;
+		case R.id.btnStop:
+			mDevice.write(new byte[]{'a','d'});
+			break;
+		default:
+			break;
+		}
 	}
 }

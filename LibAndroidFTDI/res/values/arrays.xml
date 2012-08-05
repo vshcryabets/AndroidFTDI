@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="channelT">
+        <item>Channel 0</item>
+        <item>Channel 1</item>
+        <item>Channel 2</item>
+        <item>Channel 3</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/txtVolts"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/txtVoltsStart"
+        android:textSize="56sp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="14dp" />
+
+    <TextView
+        android:id="@+id/txtReadCount"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+    <Spinner
+        android:id="@+id/snChannel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/channelT"
+        android:spinnerMode="dropdown" />
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Start" />
+
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Stop" />
+
+</LinearLayout>
